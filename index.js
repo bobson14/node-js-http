@@ -1,5 +1,6 @@
 'use strict';
 const http = require('http');
+const pug = require('pug');
 
 const server = http.createServer((req, res) => {
     const now = new Date();
@@ -10,9 +11,20 @@ const server = http.createServer((req, res) => {
     
     switch (req.method) {
         case 'GET':
-            const fs = require('fs');
-            const rs = fs.createReadStream('./form.html');
-            rs.pipe(res);
+            if (req.url === '/enquetes/yaki-shabu') {
+                res.write(pug.renderFile('./form.pug', {
+                    path: req.url,
+                    firstItem: '焼肉',
+                    secondItem: 'しゃぶしゃぶ'
+                }));
+            } else if (req.url === '/enquetes/rice-bread') {
+                res.write(pug.renderFile('./form.pug', {
+                    path: req.url,
+                    firstItem: 'ごはん',
+                    secondItem: 'パン'
+                }));
+            }
+            res.end();
             break;
         case 'POST':
             let body = '';
@@ -33,7 +45,7 @@ const server = http.createServer((req, res) => {
 }).on('clientError', (e) => {
     console.error(`[${new Date()}] Client Error`, e);
 });
-const port = 8000;
+const port = process.env.PORT || 8000;
 server.listen(port, () => {
     console.info(`[${new Date()}] Listening on ${port}`);
 });
